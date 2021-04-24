@@ -4,59 +4,59 @@ const { resolve } = require("path");
 const moment = require('moment')
 
 async function getHtml(dados) {
-  //let people = ['geddy', 'neil', 'alex'];
-  //let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  let data
   if (dados){
-    data = dados
+    data = daddos
+  }else{
+    console.log('Não veio informações. Usando dados de testes!')
+    data = JSON.parse(
+      JSON.stringify({
+        itens: [
+          {
+            item: 1,
+            produto_id: "11",
+            tamanho_id: "4",
+            quantidade: 1,
+            observacao: null,
+            ordem: "1/1",
+            descricao: "PIZZA BACON",
+            tamanho_nome: "Grande",
+            impressora: "Microsoft Print to PDF",
+          },
+          {
+            item: 2,
+            produto_id: "8",
+            tamanho_id: "6",
+            quantidade: 0.5,
+            observacao: null,
+            ordem: "1/2",
+            descricao: "PIZZA FILE BROCOLIS",
+            tamanho_nome: "Brotinho",
+            impressora: "Impressora (HP LaserJet M1536dnf MFP)", //"Impressora (HP LaserJet M1536dnf MFP)",
+          },
+          {
+            item: 2,
+            produto_id: "7",
+            tamanho_id: "6",
+            quantidade: 0.5,
+            observacao: null,
+            ordem: "2/2",
+            descricao: "PIZZA ALCATRA AO VINHO",
+            tamanho_nome: "Brotinho",
+            impressora: "Impressora (HP LaserJet M1536dnf MFP)",
+          },
+        ],
+        forma_pagamento_id: 1,
+        retirar: 0,
+        endereco_id: "1",
+        observacao: "Sem cebola, com mais pimenta",
+        cliente_nome: "PAULO THIRY NETO",
+        cliente_telefone: "(67)99926-3220",
+        data_hora: "2021-04-20 00:11:03",
+        pedido_id: 56,
+      })
+    );
   }
-
-  let data = JSON.parse(
-    JSON.stringify({
-      itens: [
-        {
-          item: 1,
-          produto_id: "11",
-          tamanho_id: "4",
-          quantidade: 1,
-          observacao: null,
-          ordem: "1/1",
-          descricao: "PIZZA BACON",
-          tamanho_nome: "Grande",
-          impressora: "Microsoft Print to PDF",
-        },
-        {
-          item: 2,
-          produto_id: "8",
-          tamanho_id: "6",
-          quantidade: 0.5,
-          observacao: null,
-          ordem: "1/2",
-          descricao: "PIZZA FILE BROCOLIS",
-          tamanho_nome: "Brotinho",
-          impressora: "Microsoft XPS Document Writer", //"Impressora (HP LaserJet M1536dnf MFP)",
-        },
-        {
-          item: 2,
-          produto_id: "7",
-          tamanho_id: "6",
-          quantidade: 0.5,
-          observacao: null,
-          ordem: "2/2",
-          descricao: "PIZZA ALCATRA AO VINHO",
-          tamanho_nome: "Brotinho",
-          impressora: "Microsoft XPS Document Writer",
-        },
-      ],
-      forma_pagamento_id: 1,
-      retirar: 0,
-      endereco_id: "1",
-      observacao: "Sem cebola, com mais pimenta",
-      cliente_nome: "PAULO THIRY NETO",
-      cliente_telefone: "(67)99926-3220",
-      data_hora: "2021-04-20 00:11:03",
-      pedido_id: 56,
-    })
-  );
 
   let itensPed = data.itens;
 
@@ -102,7 +102,7 @@ async function makeHtml(data, itensImpressora) {
               <th style="width: 355.2px;" colspan="4">
               <h2 style="color: #2e6c80;">Pedido:${data.pedido_id}</h2>
               </th>
-              <th style="width: 111.2px;">${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format()}</th>
+              <th style="width: 111.2px;">${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format('L')} ${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format('LTS')}</th>
             </tr>
             <tr>
               <th style="width: 355.2px; text-align: left !important;" colspan="3">Nome: ${data.cliente_nome}</th>
