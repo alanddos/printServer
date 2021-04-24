@@ -1,10 +1,15 @@
 const { rejects } = require("assert");
 let ejs = require("ejs");
 const { resolve } = require("path");
+const moment = require('moment')
 
 async function getHtml(dados) {
   //let people = ['geddy', 'neil', 'alex'];
   //let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  if (dados){
+    data = dados
+  }
+
   let data = JSON.parse(
     JSON.stringify({
       itens: [
@@ -28,7 +33,7 @@ async function getHtml(dados) {
           ordem: "1/2",
           descricao: "PIZZA FILE BROCOLIS",
           tamanho_nome: "Brotinho",
-          impressora: "Microsoft XPS Document Writer",
+          impressora: "Microsoft XPS Document Writer", //"Impressora (HP LaserJet M1536dnf MFP)",
         },
         {
           item: 2,
@@ -56,8 +61,6 @@ async function getHtml(dados) {
   let itensPed = data.itens;
 
   let impressora = [...new Set(itensPed.map((item) => item.impressora))];
-  console.log(impressora);
-
   let itensImpressora = [];
   impressora.map((i) => {
     itensImpressora.push({
@@ -73,8 +76,11 @@ async function getHtml(dados) {
   let impressao = [];
   for await (const imp of itensImpressora) {
     let obj = await makeHtml(data, imp.itens);
+    console.log('------------------------------------------------------------------------------------');
+    console.log(imp.impressora);
+    console.log('------------------------------------------------------------------------------------');
     console.log(obj);
-    console.log('----------------------------');
+    console.log('------------------------------------------------------------------------------------');
     impressao.push({
       impressora: imp.impressora,
       html: obj,
@@ -96,7 +102,7 @@ async function makeHtml(data, itensImpressora) {
               <th style="width: 355.2px;" colspan="4">
               <h2 style="color: #2e6c80;">Pedido:${data.pedido_id}</h2>
               </th>
-              <th style="width: 111.2px;">${data.data_hora}</th>
+              <th style="width: 111.2px;">${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format()}</th>
             </tr>
             <tr>
               <th style="width: 355.2px; text-align: left !important;" colspan="3">Nome: ${data.cliente_nome}</th>

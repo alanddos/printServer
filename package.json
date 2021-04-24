@@ -10,9 +10,11 @@
   "license": "MIT",
   "dependencies": {
     "@thiagoelg/node-printer": "^0.5.3",
+    "bluebird": "^3.7.2",
     "ejs": "^3.1.6",
     "express": "4.17.1",
     "html-pdf": "^3.0.0",
+    "moment": "^2.29.1",
     "path": "^0.12.7",
     "printer": "^0.4.0"
   }

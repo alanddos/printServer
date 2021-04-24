@@ -12,16 +12,16 @@ app.post('/impressoras',async (req, res) => {
 })
 
 app.post('/imprimir',async (req, res) => {  
-    //console.log(req.body)
-    console.log('1')
+  try {
     let html = await ejsService.getHtml()
-    console.log('2')
     let arquivo = await printService.printHtml(html)
-    console.log('3')
     let imprimir = await printService.printNow(arquivo)
-    console.log('4')
-    console.log(imprimir)
-    res.send(req.body) //res.send(imprimir)
+    res.send(imprimir)
+  } catch (error) {
+    res.send(error)
+  }
+    //console.log(req.body)
+    
 })
 
 app.listen(port, () => {
