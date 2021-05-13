@@ -1,17 +1,28 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
+app.use(express.static(__dirname));
+const http = require('http');
+const server = http.createServer(app);
+
+//Socket
+const { Server } = require("socket.io");
+const io = new Server(server);
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+//Socket
+
+
 const printService = require('./impressao')
 const ejsService = require('./ejsHtml')
-app.use(express.static(__dirname));
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-const { socketConnection } = require('./socket.io.service');
-const http = require('http');
-const server = http.createServer(app);
-socketConnection(server)
+//const jasper = require('./jasper')
+
+const port = 3500
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -35,6 +46,6 @@ app.post('/imprimir',async (req, res) => {
   }
 })
 
-server.listen(3000, () => {
-  console.log('listening on *:3000');
-});
+app.listen(port, () => {
+  console.log(`Servidor Rodando em http://localhost:${port}`)
+})

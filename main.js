@@ -41,16 +41,18 @@ function createWindow() {
   });
 
   // Visit the express server page
-  //mainWindow.loadURL("http://localhost:3500/");
+  mainWindow.loadURL("http://localhost:3000/");
   mainWindow.focus();
 
-  mainWindow.loadURL(
-    require("url").format({
-      pathname: path.join(__dirname, "index.html"),
-      protocol: "file:",
-      slashes: true,
-    })
-  );
+  //carregando pelo express
+  // mainWindow.loadURL(
+  //   require("url").format({
+  //     pathname: path.join(__dirname, "index.html"),
+  //     protocol: "file:",
+  //     slashes: true,
+  //   })
+  // );
+
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
