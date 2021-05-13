@@ -72,7 +72,7 @@ async function printNow(dados) {
         data: fs.readFileSync(filename),
         printer: printerName, // printer name, if missing then will print to default printer
         success: function (jobID) {
-          fs.rmSync(filename)
+          //fs.rmSync(filename)
           console.log("Impressão enviada ID: " + jobID);
         },
         error: function (err) {

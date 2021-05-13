@@ -2,12 +2,15 @@ const { rejects } = require("assert");
 let ejs = require("ejs");
 const { resolve } = require("path");
 const moment = require('moment')
+moment.locale('pt-br')
 
 async function getHtml(dados) {
+  console.log(dados)
   let data
   if (dados){
-    data = daddos
+    data = dados
   }else{
+    throw new Error("A requisição não possui informações");
     console.log('Não veio informações. Usando dados de testes!')
     data = JSON.parse(
       JSON.stringify({
@@ -141,6 +144,7 @@ async function makeHtml(data, itensImpressora) {
       }
     } catch (error) {
       console.log("Falha ao criar html buffer", error);
+      throw new Error("Falha ao criar html buffer")      
     }
   });
 }

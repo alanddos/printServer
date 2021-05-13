@@ -49,3 +49,16 @@ Server para receber uma requisição externa e imprimir pedidos em impressoras d
   "data_hora": "2021-04-20 00:11:03",
   "pedido_id": 56
 }
+
+
+rebuild para electron
+https://github.com/electron/electron/blob/master/docs/tutorial/using-native-node-modules.md
+
+# Every time you run "npm install", run this:
+./node_modules/.bin/electron-rebuild
+
+# If you have trouble on Windows, try:
+.\node_modules\.bin\electron-rebuild.cmd
+
+# Definir variavel de ambiente de logs para true
+set ELECTRON_ENABLE_LOGGING=true

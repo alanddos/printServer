@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./renderer.js"></script>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        connect-src *"
+    />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Delta Sistemas</title>
+  </head>
+  <section class="controls" style="width: 100%">
+    <div style="width: 50%; float: left">
+      <img src="./img/LOGO DELTA.PNG" width="100px" />
+    </div>
+    <div style="text-align: right;margin-left: 300px;">
+      <button id="clear" class="clear-results">Limpar Histórico</button>
+    </div>
+  </section>
+  <div class="error-message"></div>
+  <section class="results"></section>
+</html>
