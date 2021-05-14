@@ -1,12 +1,102 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  var socket = io();
-  socket.on('stdout', (msg) => {
-      console.log('Info', msg)
-    //io.emit('reimprimir', msg);
-  });
-  socket.on('stderr', (msg) => {
-    console.log('Erro!', msg)
-  });
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Delta Sistemas</title>
+    <meta http-equiv=”Content-Type” content=”text/html; charset=utf-8″>
+    <style>
+      body {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+      }
 
-</script>
+      #form {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 3rem;
+        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+      }
+      #input {
+        border: none;
+        padding: 0 1rem;
+        flex-grow: 1;
+        border-radius: 2rem;
+        margin: 0.25rem;
+      }
+      #input:focus {
+        outline: none;
+      }
+      #form > div > button {
+        background: #333;
+        border: none;
+        padding: 10px 1rem;
+        margin: 0.25rem;
+        border-radius: 3px;
+        outline: none;
+        color: #fff;
+      }
+      .button {
+        text-align: right;
+        width: -webkit-fill-available;
+      }
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages > li {
+        padding: 0.5rem 1rem;
+      }
+      #messages > li:nth-child(odd) {
+        background: #efefef;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="form" action="">
+      <div class="img">
+        <img src="./img/LOGO DELTA.PNG" width="125px" />
+      </div>
+      <div class="button">
+        <button id="button" type="submit">Limpar</button>
+      </div>
+    </form>
+    <ul id="messages"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      var messages = document.getElementById("messages");
+      var form = document.getElementById("form");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        messages.innerHTML = "";
+        var item = document.createElement("li");
+        item.innerText = `Limpou!`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+      socket.on("stdout", (msg) => {
+        let dados = JSON.parse(msg);
+        var item = document.createElement("li");
+        item.textContent = `${dados.key}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+      socket.on("html", (msg) => {
+        msg.map((el) => {
+          var item = document.createElement("li");
+          item.innerHTML  = el.html;
+          messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+  </body>  
+</html>

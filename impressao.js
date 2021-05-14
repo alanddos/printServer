@@ -54,14 +54,14 @@ async function printHtml(data) {
 
 async function printNow(dados) {
   try {
-    console.log("caminho chegou", dados);
+    //console.log("caminho chegou", dados);
     if (!dados) return "Nenhum arquivo foi definido!";
     if (dados.length === 0) return "Nenhum Arquivo e impressora indefinido!";
 
     dados.map((data) => {
       let printerName = data.impressora;
       let filename = path.join(data.caminho);
-      console.log(`Imprimindo arquivo: ${filename}`);
+      //console.log(`Imprimindo arquivo: ${filename}`);
       if (process.platform != "win32") {
         print.printFile({
           filename: filename,
@@ -79,6 +79,8 @@ async function printNow(dados) {
             const message = JSON.stringify({filename: filename, printerName: printerName, key: stderr});
             const key = "stderr";
             sendDirectMessage( key, message);
+            data.err = true
+            data.message = err.message
           },
         });
       } else {
@@ -96,23 +98,27 @@ async function printNow(dados) {
           },
           error: function (err) {
             console.log(err);
-            const message = JSON.stringify({filename: filename, printerName: printerName, key: 'Falha na Impressão'});
-            const key = "stderr";
+            const message = JSON.stringify({filename: filename, printerName: printerName, key: 'Falha na Impressão ('+ printerName +') Detalhes:> ' + err.message});
+            const key = "stdout";
             sendDirectMessage( key, message);
+            data.err = true
+            data.message = err.message
           },
         });
       }
     });
     return { err: false, data: dados };
   } catch (error) {
+    const message = JSON.stringify({filename: filename, printerName: printerName, key: error + 'Cath'});
+    const key = "stdout";
+    sendDirectMessage( key, message);
     return { err: true, data: erro };
   }
 }
 
-function getPrinters(printerName) {
+function getPrinters() {
   let printers = print.getPrinters();
-  console.log(printerName);
-  console.log(printers);
+  return { err: false, data: printers };
 }
 
 module.exports = {

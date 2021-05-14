@@ -1,64 +1,20 @@
 const { rejects } = require("assert");
 let ejs = require("ejs");
 const { resolve } = require("path");
-const moment = require('moment')
-moment.locale('pt-br')
+const moment = require("moment");
+moment.locale("pt-br");
+const {
+  sendMessage,
+  getRooms,
+  sendDirectMessage,
+} = require("./socket.io.service");
 
 async function getHtml(dados) {
-  console.log(dados)
-  let data
-  if (dados){
-    data = dados
-  }else{
+  let data;
+  if (dados) {
+    data = dados;
+  } else {
     throw new Error("A requisição não possui informações");
-    console.log('Não veio informações. Usando dados de testes!')
-    data = JSON.parse(
-      JSON.stringify({
-        itens: [
-          {
-            item: 1,
-            produto_id: "11",
-            tamanho_id: "4",
-            quantidade: 1,
-            observacao: null,
-            ordem: "1/1",
-            descricao: "PIZZA BACON",
-            tamanho_nome: "Grande",
-            impressora: "Microsoft Print to PDF",
-          },
-          {
-            item: 2,
-            produto_id: "8",
-            tamanho_id: "6",
-            quantidade: 0.5,
-            observacao: null,
-            ordem: "1/2",
-            descricao: "PIZZA FILE BROCOLIS",
-            tamanho_nome: "Brotinho",
-            impressora: "Impressora (HP LaserJet M1536dnf MFP)", //"Impressora (HP LaserJet M1536dnf MFP)",
-          },
-          {
-            item: 2,
-            produto_id: "7",
-            tamanho_id: "6",
-            quantidade: 0.5,
-            observacao: null,
-            ordem: "2/2",
-            descricao: "PIZZA ALCATRA AO VINHO",
-            tamanho_nome: "Brotinho",
-            impressora: "Impressora (HP LaserJet M1536dnf MFP)",
-          },
-        ],
-        forma_pagamento_id: 1,
-        retirar: 0,
-        endereco_id: "1",
-        observacao: "Sem cebola, com mais pimenta",
-        cliente_nome: "PAULO THIRY NETO",
-        cliente_telefone: "(67)99926-3220",
-        data_hora: "2021-04-20 00:11:03",
-        pedido_id: 56,
-      })
-    );
   }
 
   let itensPed = data.itens;
@@ -79,16 +35,25 @@ async function getHtml(dados) {
   let impressao = [];
   for await (const imp of itensImpressora) {
     let obj = await makeHtml(data, imp.itens);
-    console.log('------------------------------------------------------------------------------------');
+    console.log(
+      "------------------------------------------------------------------------------------"
+    );
     console.log(imp.impressora);
-    console.log('------------------------------------------------------------------------------------');
+    console.log(
+      "------------------------------------------------------------------------------------"
+    );
     console.log(obj);
-    console.log('------------------------------------------------------------------------------------');
+    console.log(
+      "------------------------------------------------------------------------------------"
+    );
     impressao.push({
       impressora: imp.impressora,
       html: obj,
     });
   }
+  const message = impressao;
+  const key = "html";
+  sendDirectMessage(key, message);
   return impressao;
 }
 
@@ -105,46 +70,63 @@ async function makeHtml(data, itensImpressora) {
               <th style="width: 355.2px;" colspan="4">
               <h2 style="color: #2e6c80;">Pedido:${data.pedido_id}</h2>
               </th>
-              <th style="width: 111.2px;">${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format('L')} ${moment(data.data_hora, 'YYYY-MM-DD hh:mm:ss').format('LTS')}</th>
+              <th style="width: 111.2px;">${moment(
+                data.data_hora,
+                "YYYY-MM-DD hh:mm:ss"
+              ).format("L")} ${moment(
+          data.data_hora,
+          "YYYY-MM-DD hh:mm:ss"
+        ).format("LTS")}</th>
             </tr>
             <tr>
-              <th style="width: 355.2px; text-align: left !important;" colspan="3">Nome: ${data.cliente_nome}</th>
-              <th style="width: 111.2px;" colspan="2">${data.cliente_telefone}</th>
+              <th style="width: 355.2px; text-align: left !important;" colspan="3">${
+                data.cliente_nome
+              }</th>
+              <th style="width: 111.2px;" colspan="2">${
+                data.cliente_telefone
+              }</th>
             </tr>
             <tr>
               <td style="width: 472px;" colspan="5">&nbsp;</td>
             </tr>
             <tr>
-              <th style="width: 45.6px;">item</th>
-              <th style="width: 208.8px;">Descri&ccedil;&atilde;o</th>
+              <th colspan="3" style="width: 208.8px;">Descri&ccedil;&atilde;o</th>
               <th >Quant</th>
-              <th>Ordem</th>
-              <th style="width: 111.2px;">Tamanho</th>
+              <th style="width: 111.2px;text-align: center;">Tamanho</th>
             </tr>
           </thead>
           <tbody>%>`);
         html += ejs.render(
-          `<% itensPed.forEach(function(item){%>
-            <tr>     
-              <td style="text-align:center"><%= item.item%></td>
-              <td><%= item.descricao%></td>
-              <td style="text-align:center"><%= item.quantidade %></td>
-              <td style="text-align:center"><%= item.ordem %></td>
-              <td style="text-align:center"><%= item.tamanho_nome %></td>
-            </tr><% })%>`,
+          `<% for (var i = 0; i < itensPed.length; i++) { %>            
+              <tr>            
+              <td colspan="3"><%= itensPed[i].descricao %></td>
+              <td style="text-align:center"><%= itensPed[i].quantidade %></td>
+              <td style="text-align:center"><%= itensPed[i].tamanho_nome %></td>
+              <% if((i-1 >= 0) && (i-1 >=0)){ %>
+                <% if(itensPed[i].item == (itensPed[i=-1]?.item)){ %>
+                  <tr colspan="5">
+                  <hr style="width:100%;margin-left:0">              
+                  </tr>
+                <% } %>
+              <% } %>
+            </tr>
+            <% } %>`,
+            
           { itensPed: itensPed }
         );
         html += ejs.render(`
       </tbody>
       </table>
       <p>Observa&ccedil;&otilde;es:<br /><strong>${data.observacao}</strong></p>
-      </html>
-        %>`);
+      </html>`);
         resolve(html);
       }
     } catch (error) {
       console.log("Falha ao criar html buffer", error);
-      throw new Error("Falha ao criar html buffer")      
+      const message = JSON.stringify({key: "Falha ao criar html buffer: " + error});
+      const key = "stderr";
+      sendDirectMessage( key, message);
+      throw new Error("Falha ao criar html buffer");
     }
   });
 }
