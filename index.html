@@ -6,9 +6,8 @@
     <style>
       body {
         margin: 0;
-        padding-bottom: 3rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+        padding-bottom: 4rem;
+        font-family: "Courier New", monospace;
       }
 
       #form {
@@ -19,7 +18,7 @@
         left: 0;
         right: 0;
         display: flex;
-        height: 3rem;
+        height: 4rem;
         box-sizing: border-box;
         backdrop-filter: blur(10px);
       }
@@ -36,7 +35,16 @@
       #form > div > button {
         background: #333;
         border: none;
-        padding: 10px 1rem;
+        padding: 17px 1rem;
+        margin: 0.25rem;
+        border-radius: 3px;
+        outline: none;
+        color: #fff;
+      }
+      .reimprimir {
+        background: #333;
+        border: none;
+        padding: 17px 1rem;
         margin: 0.25rem;
         border-radius: 3px;
         outline: none;
@@ -44,7 +52,7 @@
       }
       .button {
         text-align: right;
-        width: -webkit-fill-available;
+        width: 100px;
       }
       #messages {
         list-style-type: none;
@@ -64,6 +72,7 @@
       <div class="img">
         <img src="./img/LOGO DELTA.PNG" width="125px" />
       </div>
+      <input type="text" id="input" disabled>
       <div class="button">
         <button id="button" type="submit">Limpar</button>
       </div>
@@ -74,29 +83,52 @@
       var socket = io();
       var messages = document.getElementById("messages");
       var form = document.getElementById("form");
+      var input = document.getElementById("input");
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         messages.innerHTML = "";
         var item = document.createElement("li");
         item.innerText = `Limpou!`;
+        setTimeout(() => {
+          item.remove();
+        }, 10000);
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
       socket.on("stdout", (msg) => {
         let dados = JSON.parse(msg);
-        var item = document.createElement("li");
-        item.textContent = `${dados.key}`;
-        messages.appendChild(item);
+        input.setAttribute('value', `${dados.key}`)
         window.scrollTo(0, document.body.scrollHeight);
       });
       socket.on("html", (msg) => {
         msg.map((el) => {
           var item = document.createElement("li");
-          item.innerHTML  = el.html;
+          var btnReimprimir = document.createElement("button");
+          btnReimprimir.setAttribute("value", JSON.stringify(el));
+          btnReimprimir.setAttribute("class", 'reimprimir');
+          btnReimprimir.textContent = `Reimprimir Pedido em ${el.impressora}`
+          btnReimprimir.addEventListener("click", function (e) {            
+            e.preventDefault();
+            socket.emit('reimprimir',e.path[0].attributes[0].textContent)
+            var item = document.createElement("li");
+            item.innerText = `Impressão enviada!`;
+            setTimeout(() => {
+              item.remove()
+            }, 10000);
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+          });
+          console.log(el)
+          item.innerHTML = el.html;
+          item.appendChild(btnReimprimir)
           messages.appendChild(item);
           window.scrollTo(0, document.body.scrollHeight);
         });
       });
+
+      socket.on("Reimpressao", (msg) => {
+        console.log('Reimpressao',msg)
+      });
     </script>
-  </body>  
+  </body>
 </html>

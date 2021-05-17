@@ -63,14 +63,14 @@ async function makeHtml(data, itensImpressora) {
       let itensPed = itensImpressora;
       if (itensPed) {
         let html = ejs.render(`
-        <html>
-        <table style="border: 2px dashed #bbbbbb; width:80mm;">
+        <html style="width:80mm;">
+        <table style="border: 2px dashed #bbbbbb">
           <thead>
             <tr>
-              <th style="width: 355.2px;" colspan="4">
+              <th style="width: 355.2px;text-align: center;" colspan="4">
               <h2 style="color: #2e6c80;">Pedido:${data.pedido_id}</h2>
               </th>
-              <th style="width: 111.2px;">${moment(
+              <th style="width: 111.2px;text-align: center;">${moment(
                 data.data_hora,
                 "YYYY-MM-DD hh:mm:ss"
               ).format("L")} ${moment(
@@ -79,10 +79,13 @@ async function makeHtml(data, itensImpressora) {
         ).format("LTS")}</th>
             </tr>
             <tr>
-              <th style="width: 355.2px; text-align: left !important;" colspan="3">${
+              <th style="width: 355.2px; text-align: left !important;" colspan="5">${
                 data.cliente_nome
               }</th>
-              <th style="width: 111.2px;" colspan="2">${
+              </tr>
+              <tr>
+              <td colspan="3">&nbsp;</td>
+              <th style="width: 111.2px; text-align: right" colspan="2">${
                 data.cliente_telefone
               }</th>
             </tr>
@@ -101,15 +104,24 @@ async function makeHtml(data, itensImpressora) {
               <tr>            
               <td colspan="3"><%= itensPed[i].descricao %></td>
               <td style="text-align:center"><%= itensPed[i].quantidade %></td>
-              <td style="text-align:center"><%= itensPed[i].tamanho_nome %></td>
-              <% if((i-1 >= 0) && (i-1 >=0)){ %>
-                <% if(itensPed[i].item == (itensPed[i=-1]?.item)){ %>
-                  <tr colspan="5">
-                  <hr style="width:100%;margin-left:0">              
-                  </tr>
-                <% } %>
-              <% } %>
+              <td style="text-align:center"><%= itensPed[i].tamanho_nome %></td>             
+            </tr>            
+            <% if(itensPed[i].observacao){ %>
+              <tr>
+              <td colspan="5">
+              Obs. <strong><%= itensPed[i].observacao %><s/trong>
+              </td>
+              </tr>
+            <% } %>
+            <% if(itensPed[i+1]){ %>
+            <% if(itensPed[i].item !== itensPed[i+1].item){ %>
+             <tr>
+             <td colspan="5">
+              <hr style="width:100%;margin-left:0">              
+             </td>
             </tr>
+            <% } %>
+            <% } %>
             <% } %>`,
             
           { itensPed: itensPed }
@@ -117,8 +129,10 @@ async function makeHtml(data, itensImpressora) {
         html += ejs.render(`
       </tbody>
       </table>
-      <p>Observa&ccedil;&otilde;es:<br /><strong>${data.observacao}</strong></p>
-      </html>`);
+      <% if (data.observacao && data.observacao != null) {%>
+      <p>Obs:<br /><strong>${data.observacao != null ? data.observacao : ''}</strong></p>
+      <% } %>
+      </html>`,{data : data});
         resolve(html);
       }
     } catch (error) {

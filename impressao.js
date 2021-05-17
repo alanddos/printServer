@@ -3,8 +3,9 @@ var path = require("path");
 var Promise = require("bluebird");
 const pdf = Promise.promisifyAll(require("html-pdf"));
 const moment = require("moment");
-const { sendMessage, getRooms, sendDirectMessage } = require("./socket.io.service");
+const { sendMessage, getRooms, sendDirectMessage} = require("./socket.io.service");
 const { stderr } = require("process");
+
 
 //cria um pdf asyncrono
 async function makePdf(data) {
@@ -49,7 +50,9 @@ async function printHtml(data) {
       arquivos.push(arquivo);
     }
     return arquivos;
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 async function printNow(dados) {
@@ -68,8 +71,7 @@ async function printNow(dados) {
           printer: printerName, // printer name, if missing then will print to default printer
           success: function (jobID) {
             console.log("Impressão enviada ID: " + jobID);
-            let rooms = getRooms()
-            console.log('Salas', rooms)
+            
             const message = JSON.stringify({filename: filename, printerName: printerName, key: stdout});
             const key = "stdout";
             sendDirectMessage( key, message);
@@ -85,9 +87,13 @@ async function printNow(dados) {
         });
       } else {
         // not yet implemented, use printDirect and text
+        //console.log(print.getSupportedPrintFormats(printerName), printerName)
+        // console.log("---------------------")
+        //console.log(print.getSupportedJobCommands(printerName), printerName)
         var fs = require("fs");
         print.printDirect({
           data: fs.readFileSync(filename),
+          type: 'PDF',
           printer: printerName, // printer name, if missing then will print to default printer
           success: function (jobID) {
             //fs.rmSync(filename)
@@ -109,10 +115,11 @@ async function printNow(dados) {
     });
     return { err: false, data: dados };
   } catch (error) {
-    const message = JSON.stringify({filename: filename, printerName: printerName, key: error + 'Cath'});
+    const message = JSON.stringify({key: error });
     const key = "stdout";
     sendDirectMessage( key, message);
-    return { err: true, data: erro };
+    console.log(error)
+    return { err: true, data: JSON.stringify(error) };
   }
 }
 
